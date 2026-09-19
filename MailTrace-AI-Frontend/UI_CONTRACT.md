@@ -1,62 +1,107 @@
 # Frontend UI Contract
 
-The frontend must render authoritative backend data.
+The frontend renders authoritative backend results.
 
 ## Threat Result
 
-Example response shape:
+Example:
 
 ```json
 {
-  "classification": "SUSPICIOUS",
-  "risk_score": 78,
+  "classification": "PHISHING",
+  "risk_score": 91,
+  "threat_confidence": 0.94,
   "action": "QUARANTINE",
   "tags": [
-    "LOOKALIKE_DOMAIN",
+    "NEW_DOMAIN",
+    "DMARC_FAIL",
+    "CREDENTIAL_REQUEST",
     "SUSPICIOUS_URL"
   ]
 }
 ```
 
-## Dashboard Responsibilities
+## Security Tags
 
-### Fono User Dashboard
+Tags are short, security-focused explanations.
+
+Example display:
+
+```text
+First-Time-Sender • New-Domain • DMARC-Fail • Credential-Request • Suspicious-URL • Phishing
+```
+
+Tags are not the same as:
+
+- raw features
+- risk score
+- threat classification
+- delivery action
+
+## User Dashboard
 
 Show:
 
-- email status
-- warning
-- reason summary
-- quarantine status
-- safe actions available to the user
+- inbox
+- spam categories
+- warnings
+- quarantine
+- delivery status
+- safe email view
+- security explanation
+- policy-controlled user actions
 
-### Security Dashboard
+## Security Dashboard
 
 Show:
 
 - classification
 - risk score
-- findings
+- confidence
+- security tags
+- security findings
 - ML result
-- security result
+- authentication result
+- URL/domain findings
+- attachment/QR findings
+- behavioral/context findings
+- threat-intelligence results
 - evidence
 - timeline
 - approximate infrastructure context
+- forensic case details
 
-The UI should clearly distinguish:
+## Malicious Email Protection
+
+For malicious/high-risk quarantined email:
+
+```text
+Original content: BLOCKED
+Original attachment: BLOCKED
+Suspicious links: NOT AUTO-OPENED
+```
+
+Show a sanitized security report instead.
+
+## Data Provenance
+
+Clearly distinguish:
 
 - verified evidence
 - derived analysis
 - approximate information
 - model predictions
 
-## Important
+## Backend Authority
 
 The frontend must not change:
 
+- security features
 - risk score
+- confidence
 - classification
-- security findings
+- findings
+- security tags
 - delivery action
 
 It only presents backend results.

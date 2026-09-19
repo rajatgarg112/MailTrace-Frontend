@@ -8,9 +8,9 @@
 
 `main`
 
-This repository contains the complete frontend for MailTrace-AI.
+This repository contains the complete React + Vite frontend.
 
-Both user-facing interfaces remain in the same frontend repository.
+Both user-facing interfaces remain in the same frontend repository:
 
 ```text
 MailTrace-AI-Frontend
@@ -23,37 +23,79 @@ MailTrace-AI-Frontend
 
 The frontend is responsible for:
 
-- dashboard UI
-- email list and detail views
-- security findings presentation
-- threat/risk visualization
+- inbox
+- spam categories
+- warning/hold views
 - quarantine interface
-- forensic case interface
+- email detail views
+- security findings presentation
+- security tags
+- risk visualization
+- delivery status
 - evidence/timeline visualization
+- approximate infrastructure map/context
+- forensic case interface
 - API integration
 - loading/error states
 
-The frontend is **not** responsible for:
+## Frontend Must Not Decide Security
+
+The frontend is not responsible for:
 
 - direct database access
 - final threat classification
 - ML inference
 - security verdict generation
+- risk calculation
+- delivery policy
 - forensic evidence generation
+
+The backend is authoritative.
+
+## Harmful Email UI
+
+### Safe
+
+Normal email view.
+
+### Spam
+
+User may view according to policy.
+
+### Suspicious
+
+Show warning before controlled access.
+
+### Malicious / High Risk
+
+Do not render the original body/attachment by default.
+
+Show:
+
+- threat category
+- risk score
+- confidence
+- security tags
+- authentication findings
+- URL findings
+- attachment findings
+- evidence
+- forensic summary
+- delivery/quarantine action
 
 ## Communication
 
 ```text
-Frontend
-   ↓
+React + Vite
+     ↓
 REST API
-   ↓
-Backend
-   ↓
-Database
+     ↓
+FastAPI Backend
+     ↓
+Database / Analysis Services
 ```
 
-The frontend should consume authoritative backend responses.
+For local development, frontend and backend may run on separate ports. CORS/API configuration must be handled by the backend integration setup.
 
 ## Suggested Structure
 
