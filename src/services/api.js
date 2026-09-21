@@ -53,6 +53,7 @@ class ApiService {
     const url = `${this.baseUrl}${endpoint}`;
     const headers = {
       'Content-Type': 'application/json',
+      'Authorization': `Bearer ${import.meta.env.VITE_API_SECRET_KEY || 'dev_secret_key_change_in_production'}`,
       ...options.headers,
     };
 
