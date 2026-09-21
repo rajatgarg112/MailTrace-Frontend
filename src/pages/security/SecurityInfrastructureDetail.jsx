@@ -63,6 +63,59 @@ export function SecurityInfrastructureDetail() {
         </div>
       </div>
 
+      {/* VISUAL GEOLOCATION THREAT MAP */}
+      <Card title="Live Infrastructure Geolocation Map" style={{ marginBottom: '1.5rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <span style={{ fontWeight: 600, fontSize: '0.95rem', color: 'var(--text-primary)' }}>
+              📍 {infra.approximateRegion || 'Brandenburg an der Havel, Germany'}
+            </span>
+            {infra.isVpnOrTor && (
+              <span style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)', padding: '0.2rem 0.5rem', borderRadius: 4, fontSize: '0.75rem', fontWeight: 700 }}>
+                🚨 TOR EXIT NODE DETECTED
+              </span>
+            )}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+            <code style={{ background: 'var(--bg-primary)', padding: '0.2rem 0.5rem', borderRadius: 4, border: '1px solid var(--border-color)', color: 'var(--accent-cyan)' }}>
+              Lat: {infra.mapMarker?.latitude || 52.6171}°, Lon: {infra.mapMarker?.longitude || 13.1207}°
+            </code>
+            <a 
+              href={`https://www.openstreetmap.org/?mlat=${infra.mapMarker?.latitude || 52.6171}&mlon=${infra.mapMarker?.longitude || 13.1207}#map=12/${infra.mapMarker?.latitude || 52.6171}/${infra.mapMarker?.longitude || 13.1207}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ui-btn ui-btn-outline"
+              style={{ fontSize: '0.75rem', padding: '0.2rem 0.6rem' }}
+            >
+              Full Screen Map ↗
+            </a>
+          </div>
+        </div>
+
+        {/* Embedded Interactive Map Frame */}
+        <div style={{
+          width: '100%',
+          height: '340px',
+          borderRadius: 8,
+          overflow: 'hidden',
+          border: '1px solid var(--border-color)',
+          background: 'var(--bg-primary)',
+          position: 'relative'
+        }}>
+          <iframe
+            title="Infrastructure Threat Geolocation Map"
+            width="100%"
+            height="100%"
+            frameBorder="0"
+            scrolling="no"
+            marginHeight="0"
+            marginWidth="0"
+            src={`https://www.openstreetmap.org/export/embed.html?bbox=${(infra.mapMarker?.longitude || 13.1207) - 0.08}%2C${(infra.mapMarker?.latitude || 52.6171) - 0.05}%2C${(infra.mapMarker?.longitude || 13.1207) + 0.08}%2C${(infra.mapMarker?.latitude || 52.6171) + 0.05}&layer=mapnik&marker=${infra.mapMarker?.latitude || 52.6171}%2C${infra.mapMarker?.longitude || 13.1207}`}
+            style={{ border: 0, filter: 'brightness(0.9) contrast(1.1)' }}
+          />
+        </div>
+      </Card>
+
       <div className="grid-2" style={{ marginBottom: '1.5rem' }}>
         <Card title="Origin Network Metadata">
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', fontSize: '0.875rem' }}>
