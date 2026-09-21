@@ -68,6 +68,48 @@ export function Sidebar({ items = [], mode = 'fono', isOpen = false, onClose }) 
           })}
         </nav>
 
+        <div style={{ padding: '0.75rem 0.5rem', borderTop: '1px solid var(--border-color)', margin: '0.5rem 0' }}>
+          {isSecurity ? (
+            <a
+              href="http://localhost:5173/fono"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                fontSize: '0.775rem',
+                padding: '0.45rem 0.65rem',
+                borderRadius: '6px',
+                color: 'var(--text-secondary)',
+                textDecoration: 'none',
+                background: 'var(--bg-secondary)',
+                border: '1px solid var(--border-color)'
+              }}
+            >
+              <Shield size={14} style={{ color: 'var(--accent-cyan)' }} />
+              <span>Switch to User Mailbox</span>
+            </a>
+          ) : (
+            <a
+              href="http://localhost:5174/security"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                fontSize: '0.775rem',
+                padding: '0.45rem 0.65rem',
+                borderRadius: '6px',
+                color: 'var(--text-secondary)',
+                textDecoration: 'none',
+                background: 'var(--bg-secondary)',
+                border: '1px solid var(--border-color)'
+              }}
+            >
+              <Lock size={14} style={{ color: '#818cf8' }} />
+              <span>Switch to Security SOC</span>
+            </a>
+          )}
+        </div>
+
         <div className="sidebar-footer">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem', fontSize: '0.725rem', color: 'var(--text-muted)' }}>
             {isSecurity ? <Lock size={12} style={{ color: '#8b5cf6' }} /> : <Shield size={12} style={{ color: 'var(--accent-cyan)' }} />}

@@ -74,8 +74,12 @@ class ApiService {
 
       return await response.json();
     } catch (error) {
-      // If server returned an explicit HTTP error (401, 403, 404, 500), propagate it
+      // If server returned an explicit HTTP error (401, 403, 404, 500), check if fallback is available for 404
       if (error instanceof ApiError && !error.isNetworkError) {
+        if (error.status === 404 && fallbackResolver) {
+          console.info(`[ApiService Dev Notice] 404 on ${url}. Serving isolated contract fallback.`);
+          return await Promise.resolve(fallbackResolver());
+        }
         throw error;
       }
 

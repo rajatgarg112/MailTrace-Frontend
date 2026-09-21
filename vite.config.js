@@ -10,6 +10,9 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react()],
+    define: {
+      'import.meta.env.VITE_APP_MODE': JSON.stringify(isSecurity ? 'security' : 'user'),
+    },
     resolve: {
       alias: {
         '@': path.resolve(__dirname, './src'),

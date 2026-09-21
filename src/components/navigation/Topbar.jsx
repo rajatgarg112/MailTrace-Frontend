@@ -51,10 +51,52 @@ export function Topbar({ onToggleSidebar }) {
       )}
 
       <div className="topbar-actions">
-        
+        {/* Quick Portal Switcher Button */}
+        {isSecurity ? (
+          <a
+            href="http://localhost:5173/fono"
+            className="ui-btn ui-btn-outline"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              fontSize: '0.8rem',
+              padding: '0.35rem 0.75rem',
+              borderRadius: '6px',
+              textDecoration: 'none',
+              border: '1px solid #38bdf8',
+              color: '#38bdf8',
+              background: 'rgba(56, 189, 248, 0.08)',
+              fontWeight: 600
+            }}
+          >
+            <Mail size={15} />
+            <span>📬 Open User Mailbox (5173)</span>
+          </a>
+        ) : (
+          <a
+            href="http://localhost:5174/security"
+            className="ui-btn ui-btn-outline"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              fontSize: '0.8rem',
+              padding: '0.35rem 0.75rem',
+              borderRadius: '6px',
+              textDecoration: 'none',
+              border: '1px solid #818cf8',
+              color: '#818cf8',
+              background: 'rgba(129, 140, 248, 0.08)',
+              fontWeight: 600
+            }}
+          >
+            <Lock size={15} />
+            <span>🛡️ Open Security SOC Portal (5174)</span>
+          </a>
+        )}
 
         <div className="topbar-user-profile">
-          
           <button onClick={handleLogout} className="ui-btn ui-btn-ghost topbar-logout-btn" title="Logout">
             <LogOut size={16} />
           </button>
