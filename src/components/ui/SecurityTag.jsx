@@ -10,11 +10,14 @@ import { Tag } from 'lucide-react';
  * - threat classification
  * - delivery action
  */
-export function SecurityTag({ tag, showIcon = true, size = 'medium', className = '', ...props }) {
+export function SecurityTag({ tag, tags, showIcon = true, size = 'medium', className = '', ...props }) {
+  if (Array.isArray(tags) || Array.isArray(tag)) {
+    return <SecurityTagList tags={tags || tag} size={size} className={className} {...props} />;
+  }
   // Normalize tag display string (e.g., 'DMARC_FAIL' -> 'DMARC-Fail')
   const formattedTag = typeof tag === 'string' 
     ? tag.replace(/_/g, '-')
-    : tag;
+    : (tag || '');
 
   return (
     <span 
