@@ -13,6 +13,7 @@ import NotFound from './pages/NotFound';
 // Fono Pages
 import FonoOverview from './pages/fono/FonoOverview';
 import FonoInbox from './pages/fono/FonoInbox';
+import FonoSent from './pages/fono/FonoSent';
 import FonoSpam from './pages/fono/FonoSpam';
 import FonoWarnings from './pages/fono/FonoWarnings';
 import FonoQuarantine from './pages/fono/FonoQuarantine';
@@ -42,6 +43,7 @@ export function App() {
       <Route path="/fono" element={<FonoLayout />}>
         <Route index element={<FonoOverview />} />
         <Route path="inbox" element={<FonoInbox />} />
+        <Route path="sent" element={<FonoSent />} />
         <Route path="spam" element={<FonoSpam />} />
         <Route path="warnings" element={<FonoWarnings />} />
         <Route path="quarantine" element={<FonoQuarantine />} />

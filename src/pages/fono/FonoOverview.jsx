@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { LayoutDashboard, Inbox, Archive, AlertTriangle, ShieldAlert, ArrowUpRight, Mail } from 'lucide-react';
+import { LayoutDashboard, Inbox, Archive, AlertTriangle, ShieldAlert, ArrowUpRight, Mail, Send } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import PageHeader from '../../components/ui/PageHeader';
 import Card from '../../components/ui/Card';
@@ -148,6 +148,10 @@ export function FonoOverview() {
         title="Recent Inspected Delivery Status"
         action={
           <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <Link to="/fono/sent" className="ui-btn ui-btn-outline" style={{ fontSize: '0.775rem', padding: '0.25rem 0.65rem' }}>
+              <Send size={13} />
+              <span>Go to Sent</span>
+            </Link>
             <Link to="/fono/inbox" className="ui-btn ui-btn-outline" style={{ fontSize: '0.775rem', padding: '0.25rem 0.65rem' }}>
               <Mail size={13} />
               <span>Go to Inbox</span>

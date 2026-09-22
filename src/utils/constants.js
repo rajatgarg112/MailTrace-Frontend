@@ -18,6 +18,7 @@ export const ROUTES = {
   FONO: {
     OVERVIEW: '/fono',
     INBOX: '/fono/inbox',
+    SENT: '/fono/sent',
     SPAM: '/fono/spam',
     WARNINGS: '/fono/warnings',
     QUARANTINE: '/fono/quarantine',
@@ -78,6 +79,7 @@ export const SECURITY_TAGS = [
 export const FONO_NAV_ITEMS = [
   { label: 'Overview', path: ROUTES.FONO.OVERVIEW, icon: 'LayoutDashboard' },
   { label: 'Inbox', path: ROUTES.FONO.INBOX, icon: 'Inbox' },
+  { label: 'Sent', path: ROUTES.FONO.SENT, icon: 'Send' },
   { label: 'Spam', path: ROUTES.FONO.SPAM, icon: 'Archive' },
   { label: 'Warnings', path: ROUTES.FONO.WARNINGS, icon: 'AlertTriangle' },
   { label: 'Quarantine', path: ROUTES.FONO.QUARANTINE, icon: 'ShieldAlert' },

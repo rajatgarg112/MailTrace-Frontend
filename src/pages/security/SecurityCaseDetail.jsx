@@ -9,6 +9,7 @@ import ProvenanceBadge from '../../components/ui/ProvenanceBadge';
 import RiskIndicator from '../../components/ui/RiskIndicator';
 import LoadingState from '../../components/ui/LoadingState';
 import ErrorState from '../../components/ui/ErrorState';
+import ThreatSwitcher from '../../components/security/ThreatSwitcher';
 import { api } from '../../services/api';
 import { useApi } from '../../hooks/useApi';
 
@@ -33,6 +34,8 @@ export function SecurityCaseDetail() {
 
   return (
     <div>
+      <ThreatSwitcher currentId={caseData?.emailId || 'thr-8901'} basePath="/security/investigation" />
+
       <div style={{ marginBottom: '1rem' }}>
         <Link to="/security" className="ui-btn ui-btn-ghost" style={{ fontSize: '0.8rem', padding: '0.25rem 0.5rem' }}>
           <ArrowLeft size={14} />

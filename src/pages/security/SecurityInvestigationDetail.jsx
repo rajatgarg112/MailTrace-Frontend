@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { 
   Search, ShieldAlert, Cpu, Lock, Globe, Clock, FileCode, FolderLock, 
-  Paperclip, QrCode, AlertOctagon, CheckCircle, XCircle, ArrowUpRight, Zap
+  Paperclip, QrCode, AlertOctagon, CheckCircle, XCircle, ArrowUpRight, Zap, Check, Ban
 } from 'lucide-react';
 import PageHeader from '../../components/ui/PageHeader';
 import Card from '../../components/ui/Card';
@@ -12,6 +12,7 @@ import ProvenanceBadge from '../../components/ui/ProvenanceBadge';
 import RiskIndicator from '../../components/ui/RiskIndicator';
 import LoadingState from '../../components/ui/LoadingState';
 import ErrorState from '../../components/ui/ErrorState';
+import ThreatSwitcher from '../../components/security/ThreatSwitcher';
 import { api } from '../../services/api';
 import { useApi } from '../../hooks/useApi';
 
@@ -19,6 +20,37 @@ export function SecurityInvestigationDetail() {
   const { id = 'thr-8901' } = useParams();
   const fetchInv = useCallback(() => api.getInvestigationById(id), [id]);
   const { data: inv, loading, error, refetch } = useApi(fetchInv, [id]);
+
+  const [actionLoading, setActionLoading] = useState(false);
+  const [actionMsg, setActionMsg] = useState(null);
+
+  const handleRelease = async () => {
+    if (!inv?.emailId) return;
+    setActionLoading(true);
+    try {
+      await api.releaseQuarantinedEmail(inv.emailId);
+      setActionMsg({ type: 'success', text: '✅ Approved by SOC Administrator! Message released and delivered to recipient.' });
+      refetch();
+    } catch (err) {
+      setActionMsg({ type: 'error', text: 'Failed to release email: ' + (err.message || 'Unknown error') });
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleBlock = async () => {
+    if (!inv?.emailId) return;
+    setActionLoading(true);
+    try {
+      await api.blockQuarantinedEmail(inv.emailId);
+      setActionMsg({ type: 'danger', text: '🛑 Threat Confirmed! Email permanently blocked from gateway delivery.' });
+      refetch();
+    } catch (err) {
+      setActionMsg({ type: 'error', text: 'Failed to block email: ' + (err.message || 'Unknown error') });
+    } finally {
+      setActionLoading(false);
+    }
+  };
 
   if (loading) {
     return <LoadingState message={`Fetching SOC investigation workspace [${id}] from REST API...`} />;
@@ -36,7 +68,9 @@ export function SecurityInvestigationDetail() {
 
   return (
     <div>
-      <div style={{ marginBottom: '1rem' }}>
+      <ThreatSwitcher currentId={id} basePath="/security/investigation" />
+
+      <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Link to="/security/threats" className="ui-btn ui-btn-ghost" style={{ fontSize: '0.8rem', padding: '0.25rem 0.5rem' }}>
           ← Back to Threat Queue
         </Link>
@@ -48,6 +82,128 @@ export function SecurityInvestigationDetail() {
         icon={Search}
         badge={<ProvenanceBadge provenance="DERIVED_ANALYSIS" size="medium" />}
       />
+
+      {/* SOC Admin Interactive Decision Bar */}
+      <div style={{
+        background: 'var(--bg-primary, #ffffff)',
+        border: '1px solid var(--border-color, #e2e8f0)',
+        borderRadius: 8,
+        padding: '1rem 1.25rem',
+        marginBottom: '1.5rem',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: '1rem',
+      }}>
+        <div>
+          <div style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+            SOC Admin Pre-Delivery Authorization Decision:
+          </div>
+          <div style={{ fontSize: '0.775rem', color: 'var(--text-muted)', marginTop: 2 }}>
+            Current Delivery Action: <strong style={{ color: inv.riskInfo?.action === 'INBOX' ? '#10b981' : (inv.riskInfo?.action === 'REJECT' ? '#ef4444' : '#f59e0b') }}>{inv.riskInfo?.action || 'HOLD'}</strong> | Verdict: <strong style={{ color: inv.riskInfo?.classification === 'SAFE' ? '#10b981' : '#ef4444' }}>{inv.riskInfo?.classification}</strong>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+          {inv.riskInfo?.action === 'INBOX' ? (
+            <div style={{
+              background: '#ecfdf5',
+              color: '#059669',
+              border: '1px solid #10b981',
+              padding: '0.45rem 0.9rem',
+              fontSize: '0.825rem',
+              fontWeight: 700,
+              borderRadius: 6,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+            }}>
+              <Check size={16} />
+              <span>DELIVERED TO RECIPIENT INBOX</span>
+            </div>
+          ) : inv.riskInfo?.action === 'REJECT' ? (
+            <div style={{
+              background: '#fef2f2',
+              color: '#dc2626',
+              border: '1px solid #ef4444',
+              padding: '0.45rem 0.9rem',
+              fontSize: '0.825rem',
+              fontWeight: 700,
+              borderRadius: 6,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+            }}>
+              <Ban size={16} />
+              <span>PERMANENTLY BLOCKED AT GATEWAY</span>
+            </div>
+          ) : (
+            <>
+              <button
+                type="button"
+                disabled={actionLoading}
+                onClick={handleRelease}
+                className="ui-btn"
+                style={{
+                  background: 'rgba(16, 185, 129, 0.1)',
+                  color: '#059669',
+                  border: '1px solid #10b981',
+                  padding: '0.45rem 0.9rem',
+                  fontSize: '0.825rem',
+                  fontWeight: 600,
+                  borderRadius: 6,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  cursor: 'pointer',
+                }}
+              >
+                <Check size={16} />
+                <span>Approve & Deliver to Recipient</span>
+              </button>
+
+              <button
+                type="button"
+                disabled={actionLoading}
+                onClick={handleBlock}
+                className="ui-btn"
+                style={{
+                  background: 'rgba(239, 68, 68, 0.1)',
+                  color: '#dc2626',
+                  border: '1px solid #ef4444',
+                  padding: '0.45rem 0.9rem',
+                  fontSize: '0.825rem',
+                  fontWeight: 600,
+                  borderRadius: 6,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  cursor: 'pointer',
+                }}
+              >
+                <Ban size={16} />
+                <span>Confirm Threat & Block</span>
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+
+      {actionMsg && (
+        <div style={{
+          padding: '0.85rem 1.15rem',
+          borderRadius: 8,
+          marginBottom: '1.25rem',
+          fontSize: '0.85rem',
+          fontWeight: 500,
+          background: actionMsg.type === 'success' ? '#ecfdf5' : '#fef2f2',
+          color: actionMsg.type === 'success' ? '#047857' : '#b91c1c',
+          border: `1px solid ${actionMsg.type === 'success' ? '#a7f3d0' : '#fecaca'}`,
+        }}>
+          {actionMsg.text}
+        </div>
+      )}
 
       {/* Safety Notice Banner */}
       <div style={{

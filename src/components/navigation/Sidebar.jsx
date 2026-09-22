@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import * as Icons from 'lucide-react';
-import { X, Shield, Lock } from 'lucide-react';
+import { X, Shield, Lock, Zap } from 'lucide-react';
+import ComposeModal from '../email/ComposeModal';
 
 export function Sidebar({ items = [], mode = 'fono', isOpen = false, onClose }) {
   const isSecurity = mode === 'security';
+  const [isComposeOpen, setIsComposeOpen] = useState(false);
 
   const handleNavClick = () => {
     if (onClose) {
@@ -14,6 +16,11 @@ export function Sidebar({ items = [], mode = 'fono', isOpen = false, onClose }) 
 
   return (
     <>
+      <ComposeModal 
+        isOpen={isComposeOpen} 
+        onClose={() => setIsComposeOpen(false)} 
+      />
+
       {/* Backdrop for mobile screen overlay */}
       {isOpen && (
         <div 
@@ -35,18 +42,39 @@ export function Sidebar({ items = [], mode = 'fono', isOpen = false, onClose }) 
           )}
         </div>
 
-        {!isSecurity && (
-          <div style={{ padding: '0 0.25rem 0.5rem 0.25rem' }}>
+        {/* Action Button: Compose in Fono, Inject Simulation in Security */}
+        <div style={{ padding: '0 0.25rem 0.5rem 0.25rem' }}>
+          {isSecurity ? (
             <button 
               type="button" 
-              onClick={() => alert('Compose Feature: Pre-delivery mail simulation active.')}
+              onClick={() => setIsComposeOpen(true)}
+              className="ui-btn ui-btn-primary"
+              style={{
+                width: '100%',
+                padding: '0.55rem 0.75rem',
+                fontSize: '0.8rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.4rem',
+                background: '#4f46e5',
+                borderRadius: 'var(--radius-md, 8px)'
+              }}
+            >
+              <Zap size={16} />
+              <span>Inject & Test Threat</span>
+            </button>
+          ) : (
+            <button 
+              type="button" 
+              onClick={() => setIsComposeOpen(true)}
               className="sidebar-compose-btn"
             >
               <Icons.Plus size={18} />
               <span>Compose</span>
             </button>
-          </div>
-        )}
+          )}
+        </div>
 
         <nav className="sidebar-nav">
           {items.map((item) => {

@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { Activity, ArrowUpRight, Filter, Search } from 'lucide-react';
+import { Activity, ArrowUpRight, Filter, Search, Zap, Check, Ban, ShieldCheck, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import PageHeader from '../../components/ui/PageHeader';
 import Card from '../../components/ui/Card';
@@ -10,17 +10,63 @@ import RiskIndicator from '../../components/ui/RiskIndicator';
 import DataTable from '../../components/ui/DataTable';
 import LoadingState from '../../components/ui/LoadingState';
 import ErrorState from '../../components/ui/ErrorState';
+import ComposeModal from '../../components/email/ComposeModal';
 import { api } from '../../services/api';
 import { useApi } from '../../hooks/useApi';
 
 export function SecurityThreats() {
   const [statusFilter, setStatusFilter] = useState('ALL');
+  const [isSimulateOpen, setIsSimulateOpen] = useState(false);
+  const [actionLoadingId, setActionLoadingId] = useState(null);
+  const [actionMsg, setActionMsg] = useState(null);
 
   const fetchThreats = useCallback(() => {
     return api.getSecurityThreats({ status: statusFilter });
   }, [statusFilter]);
 
   const { data, loading, error, refetch } = useApi(fetchThreats, [statusFilter]);
+
+  const handleApproveRow = async (e, row) => {
+    e.stopPropagation();
+    const targetId = row.emailId || row.id;
+    setActionLoadingId(targetId);
+    try {
+      await api.releaseQuarantinedEmail(targetId);
+      setActionMsg({
+        type: 'success',
+        text: `Approved: "${row.subject}" released by SOC Admin and delivered to recipient inbox.`,
+      });
+      refetch();
+    } catch (err) {
+      setActionMsg({
+        type: 'error',
+        text: `Failed to approve "${row.subject}": ${err.message || 'Unknown error'}`,
+      });
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
+
+  const handleBlockRow = async (e, row) => {
+    e.stopPropagation();
+    const targetId = row.emailId || row.id;
+    setActionLoadingId(targetId);
+    try {
+      await api.blockQuarantinedEmail(targetId);
+      setActionMsg({
+        type: 'danger',
+        text: `Threat Blocked: "${row.subject}" permanently rejected at security gateway.`,
+      });
+      refetch();
+    } catch (err) {
+      setActionMsg({
+        type: 'error',
+        text: `Failed to block "${row.subject}": ${err.message || 'Unknown error'}`,
+      });
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
 
   const columns = [
     {
@@ -99,15 +145,77 @@ export function SecurityThreats() {
       render: (t) => <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{t}</span>,
     },
     {
-      header: 'Investigate',
+      header: 'Actions / Inspect',
       key: 'id',
       align: 'right',
-      render: (id) => (
-        <Link to={`/security/investigation/${id}`} className="ui-btn ui-btn-outline" style={{ padding: '0.25rem 0.6rem', fontSize: '0.775rem' }}>
-          <span>Inspect Workspace</span>
-          <ArrowUpRight size={13} />
-        </Link>
-      ),
+      render: (id, row) => {
+        const isActionLoading = actionLoadingId === (row.emailId || row.id);
+        const isUnderReview = row.investigationStatus === 'IN_REVIEW';
+
+        return (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.4rem' }}>
+            {isUnderReview && (
+              <>
+                <button
+                  type="button"
+                  disabled={isActionLoading}
+                  onClick={(e) => handleApproveRow(e, row)}
+                  title="Approve & Deliver to Recipient"
+                  style={{
+                    background: '#10b981',
+                    color: '#ffffff',
+                    border: 'none',
+                    padding: '0.25rem 0.55rem',
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                    borderRadius: 4,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.25rem',
+                    cursor: isActionLoading ? 'not-allowed' : 'pointer',
+                    opacity: isActionLoading ? 0.7 : 1,
+                  }}
+                >
+                  <Check size={12} />
+                  <span>Approve</span>
+                </button>
+                <button
+                  type="button"
+                  disabled={isActionLoading}
+                  onClick={(e) => handleBlockRow(e, row)}
+                  title="Confirm Threat & Block"
+                  style={{
+                    background: '#ef4444',
+                    color: '#ffffff',
+                    border: 'none',
+                    padding: '0.25rem 0.55rem',
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                    borderRadius: 4,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.25rem',
+                    cursor: isActionLoading ? 'not-allowed' : 'pointer',
+                    opacity: isActionLoading ? 0.7 : 1,
+                  }}
+                >
+                  <Ban size={12} />
+                  <span>Block</span>
+                </button>
+              </>
+            )}
+
+            <Link
+              to={`/security/investigation/${id}`}
+              className="ui-btn ui-btn-outline"
+              style={{ padding: '0.25rem 0.55rem', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
+            >
+              <span>Inspect</span>
+              <ArrowUpRight size={13} />
+            </Link>
+          </div>
+        );
+      },
     },
   ];
 
@@ -120,19 +228,77 @@ export function SecurityThreats() {
         badge={<ProvenanceBadge provenance="DERIVED_ANALYSIS" />}
       />
 
-      {/* Filter Bar */}
-      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.25rem' }}>
-        {['ALL', 'OPEN', 'IN_REVIEW', 'RESOLVED'].map((st) => (
-          <button
-            key={st}
-            onClick={() => setStatusFilter(st)}
-            className={`ui-btn ${statusFilter === st ? 'ui-btn-primary' : 'ui-btn-secondary'}`}
-            style={{ fontSize: '0.775rem', padding: '0.35rem 0.75rem', borderRadius: 'var(--radius-full)' }}
-          >
-            {st === 'ALL' ? 'All Events' : st}
-          </button>
-        ))}
+      <ComposeModal
+        isOpen={isSimulateOpen}
+        onClose={() => {
+          setIsSimulateOpen(false);
+          refetch();
+        }}
+      />
+
+      {/* Filter Bar & Attack Simulator Action */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1.25rem' }}>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          {['ALL', 'OPEN', 'IN_REVIEW', 'RESOLVED'].map((st) => (
+            <button
+              key={st}
+              onClick={() => setStatusFilter(st)}
+              className={`ui-btn ${statusFilter === st ? 'ui-btn-primary' : 'ui-btn-secondary'}`}
+              style={{ fontSize: '0.775rem', padding: '0.35rem 0.75rem', borderRadius: 'var(--radius-full)' }}
+            >
+              {st === 'ALL' ? 'All Events' : st}
+            </button>
+          ))}
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setIsSimulateOpen(true)}
+          className="ui-btn ui-btn-primary"
+          style={{
+            fontSize: '0.8rem',
+            padding: '0.4rem 0.85rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.4rem',
+            background: '#dc2626',
+            borderColor: '#dc2626',
+            fontWeight: 600,
+          }}
+        >
+          <Zap size={14} />
+          <span>+ Simulate / Inject Threat Attack</span>
+        </button>
       </div>
+
+      {/* SOC Admin Table-Level Action Feedback Banner */}
+      {actionMsg && (
+        <div style={{
+          padding: '0.75rem 1rem',
+          borderRadius: 8,
+          marginBottom: '1rem',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          fontSize: '0.85rem',
+          fontWeight: 600,
+          background: actionMsg.type === 'success' ? 'rgba(16, 185, 129, 0.12)' : 'rgba(239, 68, 68, 0.12)',
+          color: actionMsg.type === 'success' ? '#059669' : '#dc2626',
+          border: `1px solid ${actionMsg.type === 'success' ? 'rgba(16, 185, 129, 0.35)' : 'rgba(239, 68, 68, 0.35)'}`,
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            {actionMsg.type === 'success' ? <Check size={16} /> : <Ban size={16} />}
+            <span>{actionMsg.text}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setActionMsg(null)}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', padding: 2 }}
+          >
+            <X size={15} />
+          </button>
+        </div>
+      )}
 
       {loading ? (
         <LoadingState message={`Fetching threat queue events (${statusFilter}) from REST API...`} />

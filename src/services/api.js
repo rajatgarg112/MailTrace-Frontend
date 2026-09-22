@@ -127,6 +127,29 @@ class ApiService {
     return this.request(`/emails/${id}`, { method: 'GET' }, () => getFonoEmailById(id));
   }
 
+  /** POST /api/v1/emails/analyze - Submit email for live gateway pre-delivery inspection */
+  async submitEmailForAnalysis(emailPayload) {
+    return this.request('/emails/analyze', {
+      method: 'POST',
+      body: JSON.stringify(emailPayload),
+    });
+  }
+
+  /** GET /api/v1/emails?folder=sent - Retrieve sent emails */
+  async getSentEmails(params = {}) {
+    return this.getEmails({ folder: 'sent', ...params });
+  }
+
+  /** POST /api/v1/quarantine/{emailId}/release - SOC Admin approves & releases email to recipient */
+  async releaseQuarantinedEmail(emailId) {
+    return this.request(`/quarantine/${emailId}/release`, { method: 'POST' });
+  }
+
+  /** POST /api/v1/quarantine/{emailId}/block - SOC Admin confirms threat & blocks email */
+  async blockQuarantinedEmail(emailId) {
+    return this.request(`/quarantine/${emailId}/block`, { method: 'POST' });
+  }
+
   /** POST /api/v1/emails/{id}/analyze */
   async analyzeEmail(id) {
     return this.request(`/emails/${id}/analyze`, { method: 'POST' }, () => ({
