@@ -381,8 +381,6 @@ export function ComposeModal({ isOpen, onClose, onEmailSent }) {
                 {scanResult.decision?.action !== 'INBOX' ? (
                   <a
                     href="http://localhost:5174/security/threats"
-                    target="_blank"
-                    rel="noopener noreferrer"
                     className="ui-btn ui-btn-primary"
                     style={{ fontSize: '0.8rem', padding: '0.4rem 0.85rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', background: '#4f46e5' }}
                   >
