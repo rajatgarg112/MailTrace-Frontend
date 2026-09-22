@@ -100,6 +100,13 @@ export function Sidebar({ items = [], mode = 'fono', isOpen = false, onClose }) 
           {isSecurity ? (
             <a
               href="http://localhost:5173/fono"
+              target="mailtrace_fono_mailbox"
+              onClick={() => {
+                try {
+                  const win = window.open('http://localhost:5173/fono', 'mailtrace_fono_mailbox');
+                  if (win) win.focus();
+                } catch (_) {}
+              }}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -119,6 +126,13 @@ export function Sidebar({ items = [], mode = 'fono', isOpen = false, onClose }) 
           ) : (
             <a
               href="http://localhost:5174/security"
+              target="mailtrace_security_soc"
+              onClick={() => {
+                try {
+                  const win = window.open('http://localhost:5174/security', 'mailtrace_security_soc');
+                  if (win) win.focus();
+                } catch (_) {}
+              }}
               style={{
                 display: 'flex',
                 alignItems: 'center',

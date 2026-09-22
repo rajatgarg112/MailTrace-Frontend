@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 
 // Layouts
@@ -32,6 +32,16 @@ import SecurityCaseDetail from './pages/security/SecurityCaseDetail';
 import { IS_SECURITY_APP, ROUTES } from './utils/constants';
 
 export function App() {
+  useEffect(() => {
+    try {
+      if (window.location.port === '5174' || window.location.pathname.startsWith('/security')) {
+        window.name = 'mailtrace_security_soc';
+      } else if (window.location.port === '5173' || window.location.pathname.startsWith('/fono')) {
+        window.name = 'mailtrace_fono_mailbox';
+      }
+    } catch (e) {}
+  }, []);
+
   return (
     <Routes>
       {/* Landing & Public Auth */}

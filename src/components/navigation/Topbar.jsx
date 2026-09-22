@@ -55,6 +55,13 @@ export function Topbar({ onToggleSidebar }) {
         {isSecurity ? (
           <a
             href="http://localhost:5173/fono"
+            target="mailtrace_fono_mailbox"
+            onClick={() => {
+              try {
+                const win = window.open('http://localhost:5173/fono', 'mailtrace_fono_mailbox');
+                if (win) win.focus();
+              } catch (_) {}
+            }}
             className="ui-btn ui-btn-outline"
             style={{
               display: 'inline-flex',
@@ -76,6 +83,13 @@ export function Topbar({ onToggleSidebar }) {
         ) : (
           <a
             href="http://localhost:5174/security"
+            target="mailtrace_security_soc"
+            onClick={() => {
+              try {
+                const win = window.open('http://localhost:5174/security', 'mailtrace_security_soc');
+                if (win) win.focus();
+              } catch (_) {}
+            }}
             className="ui-btn ui-btn-outline"
             style={{
               display: 'inline-flex',
