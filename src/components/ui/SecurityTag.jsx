@@ -54,4 +54,9 @@ export function SecurityTagList({ tags = [], size = 'medium', limit, showEmptyFa
   );
 }
 
-export default SecurityTag;
+export default function SecurityTagListOrTag(props) {
+  if (Array.isArray(props?.tags) || Array.isArray(props?.tag)) {
+    return <SecurityTagList {...props} tags={props.tags || props.tag} />;
+  }
+  return <SecurityTag {...props} />;
+}

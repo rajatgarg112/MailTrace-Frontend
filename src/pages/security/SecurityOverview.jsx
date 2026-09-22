@@ -5,7 +5,7 @@ import PageHeader from '../../components/ui/PageHeader';
 import Card from '../../components/ui/Card';
 import StatCard from '../../components/ui/StatCard';
 import StatusBadge from '../../components/ui/StatusBadge';
-import SecurityTagList from '../../components/ui/SecurityTag';
+import { SecurityTagList } from '../../components/ui/SecurityTag';
 import ProvenanceBadge from '../../components/ui/ProvenanceBadge';
 import RiskIndicator from '../../components/ui/RiskIndicator';
 import DataTable from '../../components/ui/DataTable';
